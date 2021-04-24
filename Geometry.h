@@ -7,6 +7,7 @@
 
 #include "vector"
 #include "math.h"
+#include "random"
 
 class Position{
 public:
@@ -95,5 +96,37 @@ public:
         return;
     }
 
+};
+
+class Space{
+public:
+
+    int winX;
+    int winY;
+    std::vector<std::vector<int>> points;
+
+    Space(int x, int y){
+        this->winX = x;
+        this->winY = y;
+
+        for (int i = 0; i < winX; ++i) {
+            for (int j = 0; j < winY; ++j){
+                points.push_back({i,j});
+            }
+        }
+        return;
+    }
+
+    std::vector<int> getRandomPoint(){
+        std::random_device randomDevice;
+        std::mt19937  engine{randomDevice()};
+        std::uniform_real_distribution<double> dist(0, this->points.size());
+        return this->points[dist(engine)];
+    }
+
+    Node* getRandomNode(){
+        std::vector<int> randomPoint = this->getRandomPoint();
+        return new Node(new Position(randomPoint[0], randomPoint[1]));
+    }
 };
 #endif //UNTITLED1_GEOMETRY_H
