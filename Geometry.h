@@ -29,6 +29,7 @@ public:
 
     Node(Position* pos){
         this->pos = pos;
+        this->parent = NULL;
         return;
     }
 
@@ -92,10 +93,24 @@ public:
         return sqrt(pow(node->pos->posY - randomNode->pos->posY, 2) + pow(node->pos->posX - randomNode->pos->posX,2));
     }
 
-    void expandToRandom(Node* randomNode){
+    void expandToRandom(Node*expandFrom, Node* randomNode){
+        addNode(expandFrom,randomNode);
         return;
     }
 
+};
+
+class Obstacle{
+public:
+
+    Position* center;
+    int* radius;
+
+    Obstacle(Position* center, int* radius){
+        this->center = center;
+        this->radius= radius;
+        return;
+    }
 };
 
 class Space{
@@ -103,16 +118,31 @@ public:
 
     int winX;
     int winY;
+    std::vector<int> start;
+    std::vector<int> goal;
     std::vector<std::vector<int>> points;
+    std::vector<Obstacle*> obstacles;
 
-    Space(int x, int y){
+    Space(int x, int y, std::vector<int> start, std::vector<int> goal, std::vector<std::vector<int>> obst){
         this->winX = x;
         this->winY = y;
+        this->start = start;
+        this->goal = goal;
 
         for (int i = 0; i < winX; ++i) {
             for (int j = 0; j < winY; ++j){
                 points.push_back({i,j});
             }
+        }
+        initObstacles(obst);
+        return;
+    }
+
+    void initObstacles(std::vector<std::vector<int>> tuples){
+        for (int i = 0; i < tuples.size(); ++i) {
+            Position* centerPos = new Position(tuples[i][1],tuples[i][2]);
+            Obstacle* obstacleNew = new Obstacle(centerPos,&tuples[i][0]);
+            this->obstacles.push_back(obstacleNew);
         }
         return;
     }
@@ -128,5 +158,55 @@ public:
         std::vector<int> randomPoint = this->getRandomPoint();
         return new Node(new Position(randomPoint[0], randomPoint[1]));
     }
+
+    void removeNodeFreeSpace(Node* node){
+        //points.erase(std::remove(points.begin(), points.end(), node->getPos()), points.end());
+    }
 };
+
+bool radialPosCheck(Position* checkPoint, Position* center, int* radius){
+    int radialPos = sqrt(pow(checkPoint->posX -center->posX,2)+pow(checkPoint->posY -center->posY,2));
+    if (radialPos <= *radius){
+        return true;
+    }
+    return false;
+}
+
+bool radialPosCheckFloat(Position* checkPoint, Position* center, float * radius){
+    float radialPos = sqrt(pow(checkPoint->posX -center->posX,2)+pow(checkPoint->posY -center->posY,2));
+    if (radialPos <= *radius){
+        return false;
+    }
+    return true;
+}
+
+bool insidePolygon(Obstacle* obstacle, Position* point){
+    if (radialPosCheck(point, obstacle->center, obstacle->radius)){
+        return true;
+    }
+    return false;
+}
+
+int distToLine(Obstacle* obs, Position* start, Position* end){
+    int x0 = obs->center->posX;
+    int x1 = start->posX;
+    int x2 = end->posX;
+    int y0 = obs->center->posY;
+    int y1 = start->posY;
+    int y2 = end->posY;
+
+    int nume = abs((x2-x1)*(y1-y0) - (x1-x0)*(y2-y1));
+    int deno = int(sqrt(pow(x2-x1,2) + pow(y2-y1,2)));
+
+    return int(nume/deno);
+}
+
+bool linePassesObstacle(Obstacle* obs, Position* start, Position* end){
+    if (distToLine(obs,start,end) < *(obs->radius)){
+        return true;
+    }
+    return false;
+}
+
+
 #endif //UNTITLED1_GEOMETRY_H
