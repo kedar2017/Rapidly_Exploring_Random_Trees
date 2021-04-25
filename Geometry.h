@@ -8,6 +8,7 @@
 #include "vector"
 #include "math.h"
 #include "random"
+#include "map"
 
 class Position{
 public:
@@ -33,7 +34,7 @@ public:
         return;
     }
 
-     Position* getPos(){
+    Position* getPos(){
         return this->pos;
     }
 
@@ -93,9 +94,20 @@ public:
         return sqrt(pow(node->pos->posY - randomNode->pos->posY, 2) + pow(node->pos->posX - randomNode->pos->posX,2));
     }
 
-    void expandToRandom(Node*expandFrom, Node* randomNode){
-        addNode(expandFrom,randomNode);
-        return;
+    Node* expandToRandom(Node*expandFrom, Node* randomNode){
+        int DELTA = 5;
+        Node* addedNodeFromSpace;
+        if (estDist(expandFrom, randomNode)<DELTA){
+            addNode(expandFrom, randomNode);
+            addedNodeFromSpace = randomNode;
+        }
+        else {
+            float theta = atan2(expandFrom->pos->posY-randomNode->pos->posY,expandFrom->pos->posX-randomNode->pos->posX);
+            Node* expandTo = new Node(new Position(expandFrom->pos->posX + DELTA * cos(theta), expandFrom->pos->posY + DELTA * sin(theta)));
+            addNode(expandFrom, expandTo);
+            addedNodeFromSpace = expandTo;
+        }
+        return addedNodeFromSpace;
     }
 
 };
@@ -131,7 +143,7 @@ public:
 
         for (int i = 0; i < winX; ++i) {
             for (int j = 0; j < winY; ++j){
-                points.push_back({i,j});
+                this->points.push_back({i,j});
             }
         }
         initObstacles(obst);
@@ -160,7 +172,19 @@ public:
     }
 
     void removeNodeFreeSpace(Node* node){
-        //points.erase(std::remove(points.begin(), points.end(), node->getPos()), points.end());
+        int posX = node->getPos()->posX;
+        int posY = node->getPos()->posY;
+        int vecIndex = 0;
+        for(auto point:this->points)
+        {
+            if(point[0] == posX && point[1] == posY)
+            {
+                this->points.erase(this->points.begin()+vecIndex);
+                break;
+            }
+            vecIndex++;
+        }
+        return;
     }
 };
 
@@ -210,3 +234,4 @@ bool linePassesObstacle(Obstacle* obs, Position* start, Position* end){
 
 
 #endif //UNTITLED1_GEOMETRY_H
+

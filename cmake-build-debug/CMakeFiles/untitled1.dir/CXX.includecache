@@ -13,10 +13,16 @@ math.h
 /Users/kedjoshi/CLionProjects/untitled1/math.h
 random
 /Users/kedjoshi/CLionProjects/untitled1/random
+map
+/Users/kedjoshi/CLionProjects/untitled1/map
 
 /Users/kedjoshi/CLionProjects/untitled1/main.cpp
 iostream
 -
+cstdio
+-
+string
+/Users/kedjoshi/CLionProjects/untitled1/string
 Geometry.h
 /Users/kedjoshi/CLionProjects/untitled1/Geometry.h
 

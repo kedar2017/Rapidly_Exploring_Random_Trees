@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cstdio>
+#include "string"
 #include "Geometry.h"
 
 Node* generateRandomNode(Space* space){
@@ -16,7 +18,7 @@ bool checkGoaltoTree(Tree* tree, Node* goalNode, float* threshold){
     return false;
 }
 
-void expandTree(Tree* tree, Node* startNode, Node* endNode){
+Node* expandTree(Tree* tree, Node* startNode, Node* endNode){
     return tree->expandToRandom(startNode, endNode);
 }
 
@@ -43,15 +45,34 @@ bool checkPointCollision(Space* space, Position* point){
     return false;
 }
 
+void printTree(Tree* tree){
+    Node* root = tree->root;
+    std::vector<Node*> stack;
+    stack.push_back(root);
+    while (!stack.empty()) {
+        Node* currN = stack.front();
+        stack.erase(stack.begin());
+        for (auto child:currN->children) {
+            stack.push_back(child);
+            std::cout << "Node location"  << std::endl;
+            std::cout << std::to_string(child->pos->posX) + " and " + std::to_string(child->pos->posY) << std::endl;
+        }
+    }
+}
+
 void run(Space* space){
 
     Position* pos = new Position(space->start[0],space->start[1]);
     Node* root = new Node(pos);
     Tree* tree = new Tree(root);
-    float threshold = 0.001;
+    space->removeNodeFreeSpace(root);
+    float threshold = 2;
     Node* goalNode = new Node(new Position(space->goal[0],space->goal[1]));
+    int iterations = 0;
 
     while (checkGoaltoTree(tree,goalNode,&threshold)){
+        iterations++;
+
         Node* randomNode = generateRandomNode(space);
         if (checkPointCollision(space,randomNode->getPos())){
             continue;
@@ -60,9 +81,11 @@ void run(Space* space){
         if (checkLineCollision(space, nearestNode->getPos(), randomNode->getPos())){
             continue;
         }
-        expandTree(tree,nearestNode,randomNode);
-        updateFreeSpace(space,randomNode);
+
+        Node* removeNodefromSpace = expandTree(tree,nearestNode,randomNode);
+        updateFreeSpace(space,removeNodefromSpace);
     }
+    printTree(tree);
 }
 
 int main() {
@@ -71,8 +94,8 @@ int main() {
     int winY = 100;
 
     std::vector<int> start{10,10};
-    std::vector<int> goal{90,90};
-    std::vector<std::vector<int>> obstacles{{30,40,10},{0,0,0}};
+    std::vector<int> goal{20,20};
+    std::vector<std::vector<int>> obstacles{{10,34,34}};
     Space* space = new Space(winX, winY, start, goal, obstacles);
 
     run(space);
