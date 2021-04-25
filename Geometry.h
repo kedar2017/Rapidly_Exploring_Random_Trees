@@ -102,7 +102,7 @@ public:
             addedNodeFromSpace = randomNode;
         }
         else {
-            float theta = atan2(expandFrom->pos->posY-randomNode->pos->posY,expandFrom->pos->posX-randomNode->pos->posX);
+            float theta = atan2(abs(expandFrom->pos->posY-randomNode->pos->posY),abs(expandFrom->pos->posX-randomNode->pos->posX));
             Node* expandTo = new Node(new Position(expandFrom->pos->posX + DELTA * cos(theta), expandFrom->pos->posY + DELTA * sin(theta)));
             addNode(expandFrom, expandTo);
             addedNodeFromSpace = expandTo;

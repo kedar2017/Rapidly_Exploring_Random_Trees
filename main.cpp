@@ -52,8 +52,8 @@ void printTree(Tree* tree){
     while (!stack.empty()) {
         Node* currN = stack.front();
         stack.erase(stack.begin());
-        for (auto child:currN->children) {
-            stack.push_back(child);
+        for (Node* child:currN->children) {
+            stack.insert(stack.begin(),child);
             std::cout << "Node location"  << std::endl;
             std::cout << std::to_string(child->pos->posX) + " and " + std::to_string(child->pos->posY) << std::endl;
         }
@@ -94,8 +94,8 @@ int main() {
     int winY = 100;
 
     std::vector<int> start{10,10};
-    std::vector<int> goal{20,20};
-    std::vector<std::vector<int>> obstacles{{10,34,34}};
+    std::vector<int> goal{45,23};
+    std::vector<std::vector<int>> obstacles{{10,78,78}};
     Space* space = new Space(winX, winY, start, goal, obstacles);
 
     run(space);
