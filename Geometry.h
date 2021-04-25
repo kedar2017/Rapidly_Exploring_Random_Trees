@@ -94,8 +94,22 @@ public:
         return sqrt(pow(node->pos->posY - randomNode->pos->posY, 2) + pow(node->pos->posX - randomNode->pos->posX,2));
     }
 
-    Node* expandToRandom(Node*expandFrom, Node* randomNode){
-        int DELTA = 5;
+    Node* createNewNodetoNearest(Node* nearestNode, Node* randomNode){
+        int DELTA = 3;
+        Node* addedNodeFromSpace;
+        if (estDist(nearestNode, randomNode)<DELTA){
+            addedNodeFromSpace = randomNode;
+        }
+        else {
+            float theta = atan2(abs(nearestNode->pos->posY-randomNode->pos->posY),abs(nearestNode->pos->posX-randomNode->pos->posX));
+            Node* expandTo = new Node(new Position(nearestNode->pos->posX + DELTA * cos(theta), nearestNode->pos->posY + DELTA * sin(theta)));
+            addedNodeFromSpace = expandTo;
+        }
+        return addedNodeFromSpace;
+    }
+
+    Node* expandToRandom(Node* expandFrom, Node* randomNode){
+        int DELTA = 3;
         Node* addedNodeFromSpace;
         if (estDist(expandFrom, randomNode)<DELTA){
             addNode(expandFrom, randomNode);
@@ -189,14 +203,6 @@ public:
 };
 
 bool radialPosCheck(Position* checkPoint, Position* center, int* radius){
-    int radialPos = sqrt(pow(checkPoint->posX -center->posX,2)+pow(checkPoint->posY -center->posY,2));
-    if (radialPos <= *radius){
-        return true;
-    }
-    return false;
-}
-
-bool radialPosCheckFloat(Position* checkPoint, Position* center, float * radius){
     float radialPos = sqrt(pow(checkPoint->posX -center->posX,2)+pow(checkPoint->posY -center->posY,2));
     if (radialPos <= *radius){
         return false;
@@ -204,8 +210,16 @@ bool radialPosCheckFloat(Position* checkPoint, Position* center, float * radius)
     return true;
 }
 
+bool radialPosCheckFloat(Position* checkPoint, Position* center, int * radius){
+    float radialPos = sqrt(pow(checkPoint->posX -center->posX,2)+pow(checkPoint->posY -center->posY,2));
+    if (radialPos < *radius){
+        return true;
+    }
+    return false;
+}
+
 bool insidePolygon(Obstacle* obstacle, Position* point){
-    if (radialPosCheck(point, obstacle->center, obstacle->radius)){
+    if (radialPosCheckFloat(point, obstacle->center, obstacle->radius)){
         return true;
     }
     return false;
@@ -220,9 +234,9 @@ int distToLine(Obstacle* obs, Position* start, Position* end){
     int y2 = end->posY;
 
     int nume = abs((x2-x1)*(y1-y0) - (x1-x0)*(y2-y1));
-    int deno = int(sqrt(pow(x2-x1,2) + pow(y2-y1,2)));
+    int deno = sqrt(pow(x2-x1,2) + pow(y2-y1,2));
 
-    return int(nume/deno);
+    return nume/deno;
 }
 
 bool linePassesObstacle(Obstacle* obs, Position* start, Position* end){
