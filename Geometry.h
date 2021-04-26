@@ -95,7 +95,7 @@ public:
     }
 
     Node* createNewNodetoNearest(Node* nearestNode, Node* randomNode){
-        int DELTA = 3;
+        int DELTA = 4;
         Node* addedNodeFromSpace;
         if (estDist(nearestNode, randomNode)<DELTA){
             addedNodeFromSpace = randomNode;
@@ -109,7 +109,7 @@ public:
     }
 
     Node* expandToRandom(Node* expandFrom, Node* randomNode){
-        int DELTA = 3;
+        int DELTA = 4;
         Node* addedNodeFromSpace;
         if (estDist(expandFrom, randomNode)<DELTA){
             addNode(expandFrom, randomNode);
@@ -130,9 +130,9 @@ class Obstacle{
 public:
 
     Position* center;
-    int* radius;
+    int radius;
 
-    Obstacle(Position* center, int* radius){
+    Obstacle(Position* center, int radius){
         this->center = center;
         this->radius= radius;
         return;
@@ -167,7 +167,7 @@ public:
     void initObstacles(std::vector<std::vector<int>> tuples){
         for (int i = 0; i < tuples.size(); ++i) {
             Position* centerPos = new Position(tuples[i][1],tuples[i][2]);
-            Obstacle* obstacleNew = new Obstacle(centerPos,&tuples[i][0]);
+            Obstacle* obstacleNew = new Obstacle(centerPos,tuples[i][0]);
             this->obstacles.push_back(obstacleNew);
         }
         return;
@@ -210,9 +210,9 @@ bool radialPosCheck(Position* checkPoint, Position* center, int* radius){
     return true;
 }
 
-bool radialPosCheckFloat(Position* checkPoint, Position* center, int * radius){
+bool radialPosCheckFloat(Position* checkPoint, Position* center, int radius){
     float radialPos = sqrt(pow(checkPoint->posX -center->posX,2)+pow(checkPoint->posY -center->posY,2));
-    if (radialPos < *radius){
+    if (radialPos < radius){
         return true;
     }
     return false;
@@ -240,7 +240,10 @@ int distToLine(Obstacle* obs, Position* start, Position* end){
 }
 
 bool linePassesObstacle(Obstacle* obs, Position* start, Position* end){
-    if (distToLine(obs,start,end) < *(obs->radius)){
+
+    if (insidePolygon(obs,start) || insidePolygon(obs,end))
+        return true;
+    if (distToLine(obs,start,end) < obs->radius){
         return true;
     }
     return false;

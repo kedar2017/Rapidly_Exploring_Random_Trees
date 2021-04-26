@@ -6,22 +6,6 @@
 #include "json.h"
 
 using json = nlohmann::json;
-/*
-json j2 = {
-        {"pi", 3.141},
-        {"happy", true},
-        {"name", "Niels"},
-        {"nothing", nullptr},
-        {"answer", {
-                       {"everything", 42}
-               }},
-        {"{1,2}", {1, 0, 2},{3,2},{4,5}},
-        {"object", {
-                       {"currency", "USD"},
-                     {"value", 42.99}
-               }}
-};
-*/
 json j2;
 
 Node* generateRandomNode(Space* space){
@@ -125,15 +109,16 @@ void run(Space* space){
     }
     printTree(tree);
     printJSON(tree);
+    std::cout << space->obstacles[0]->radius << std::endl;
 }
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
-    int winX = 50;
-    int winY = 50;
+    int winX = 100;
+    int winY = 100;
 
     std::vector<int> start{10,10};
-    std::vector<int> goal{45,45};
+    std::vector<int> goal{70,70};
     std::vector<std::vector<int>> obstacles{{5,40,25},{6,17,40},{4,35,15}};
     Space* space = new Space(winX, winY, start, goal, obstacles);
     std::ofstream print("pretty.json");
