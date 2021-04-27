@@ -95,7 +95,7 @@ public:
     }
 
     Node* createNewNodetoNearest(Node* nearestNode, Node* randomNode){
-        int DELTA = 4;
+        int DELTA = 5;
         Node* addedNodeFromSpace;
         if (estDist(nearestNode, randomNode)<DELTA){
             addedNodeFromSpace = randomNode;
@@ -109,7 +109,7 @@ public:
     }
 
     Node* expandToRandom(Node* expandFrom, Node* randomNode){
-        int DELTA = 4;
+        int DELTA = 5;
         Node* addedNodeFromSpace;
         if (estDist(expandFrom, randomNode)<DELTA){
             addNode(expandFrom, randomNode);

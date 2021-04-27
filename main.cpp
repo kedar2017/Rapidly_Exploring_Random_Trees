@@ -1,6 +1,5 @@
 #include <iostream>
 #include "fstream"
-#include <cstdio>
 #include "string"
 #include "Geometry.h"
 #include "json.h"
@@ -18,8 +17,10 @@ Node* nearestNodeTree(Tree* tree, Node* sampledNode){
 
 bool checkGoaltoTree(Tree* tree, Node* goalNode, int* threshold){
     Node* nearestNode = nearestNodeTree(tree,goalNode);
-    if (radialPosCheck(goalNode->pos,nearestNode->pos,threshold))
+    if (radialPosCheck(goalNode->pos,nearestNode->pos,threshold)) {
         return true;
+    }
+    tree->expandToRandom(nearestNode,goalNode);
     return false;
 }
 
@@ -62,8 +63,6 @@ void printTree(Tree* tree){
         stack.erase(stack.begin());
         for (Node* child:currN->children) {
             stack.insert(stack.begin(),child);
-            std::cout << "Node location"  << std::endl;
-            std::cout << std::to_string(child->pos->posX) + " and " + std::to_string(child->pos->posY) << std::endl;
         }
     }
 }
@@ -77,6 +76,23 @@ void printJSON(Tree* tree){
         for (auto child:node->children){
             value = value + "{"+std::to_string(child->pos->posX)+","+std::to_string(child->pos->posY)+"},";
         }
+        j2[key] = value;
+    }
+    return;
+}
+
+void printPath(Tree* tree, Node* start, Node* end){
+    Node* parent = NULL;
+    parent = end;
+    while (parent != start){
+        int posX = parent->pos->posX;
+        int posY = parent->pos->posY;
+        std::string value = "{"+std::to_string(posX)+","+std::to_string(posY)+"}";
+        std::string key = "";
+        parent = parent->parent;
+        posX = parent->pos->posX;
+        posY = parent->pos->posY;
+        key = "{"+std::to_string(posX)+","+std::to_string(posY)+"}";
         j2[key] = value;
     }
     return;
@@ -107,9 +123,8 @@ void run(Space* space){
         removeNodefromSpace = expandTree(tree,nearestNode,randomNode);
         updateFreeSpace(space,removeNodefromSpace);
     }
-    printTree(tree);
-    printJSON(tree);
-    std::cout << space->obstacles[0]->radius << std::endl;
+    ///printJSON(tree);
+    printPath(tree,root, goalNode);
 }
 
 int main() {
@@ -117,9 +132,9 @@ int main() {
     int winX = 100;
     int winY = 100;
 
-    std::vector<int> start{10,10};
-    std::vector<int> goal{70,70};
-    std::vector<std::vector<int>> obstacles{{5,40,25},{6,17,40},{4,35,15}};
+    std::vector<int> start{70,10};
+    std::vector<int> goal{10,10};
+    std::vector<std::vector<int>> obstacles{{15,40,25},{15,17,40},{10,35,15},{15,60,80},{15,50,10}};
     Space* space = new Space(winX, winY, start, goal, obstacles);
     std::ofstream print("pretty.json");
 
